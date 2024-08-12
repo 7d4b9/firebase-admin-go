@@ -277,7 +277,9 @@ func (tv *tokenVerifier) verifyHeaderAndBody(token string, isEmulator bool) (*To
 		return nil, fmt.Errorf("%s has invalid algorithm; expected 'RS256' but got %q",
 			tv.shortName, header.Algorithm)
 	}
-	if payload.Audience != tv.projectID {
+	//workaround as google.com idp is using the blocking function complete uri instead of the only project_id
+	// https://openid.net/specs/openid-connect-core-1_0.html#IDToken
+	if !strings.Contains(payload.Audience, tv.projectID) {
 		return nil, fmt.Errorf("%s has invalid 'aud' (audience) claim; expected %q but got %q; %s",
 			tv.shortName, tv.projectID, payload.Audience, tv.getProjectIDMatchMessage())
 	}
